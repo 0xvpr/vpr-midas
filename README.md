@@ -1,14 +1,12 @@
-# vpr-omega-zero
-Inspired by yellobytes's <a href="https://github.com/yellowbyte/reverse-engineering-playground/tree/master/file_format_hacks">zeroSection2.py</a>  
-
-This project aims to provide a tool for the stripping of the  
-section-header information of 32/64 bit ELF and PE32 executables.
+# vpr-midas
+This project aims to provide a tool for the modification of the  
+date-time information of a file.
 
 ## Docker Environment
 ```
 # Download repo
-git clone https://github.com/0xvpr/vpr-omega-zero
-cd vpr-omega-zero
+git clone https://github.com/0xvpr/vpr-midas
+cd vpr-midas
 
 # Create docker image
 chmod +x docker-build.sh && ./docker-build.sh
@@ -17,18 +15,18 @@ chmod +x docker-start.sh && ./docker-start.sh
 
 ## Build instructions
 ```bash
-git clone https://github.com/0xvpr/vpr-omega-zero
-cd vpr-omega-zero
+git clone https://github.com/0xvpr/vpr-midas
+cd vpr-midas
 make
-sudo make install # if you want it available globally
+# sudo make install # if you want it available globally (only recommended for WSL/MSYS environments)
 ```
 
 ## Example Usage
 ```bash
-vpr-omega-zero path/to/executable [ path/to/other/executable ]
+vpr-midas path/to/file [ -c | --custom | -s | --silent ]
 ```
 
 ## Testing (Needs improvement)
 ```bash
-chmod +x compare.sh && ./compare.sh
+chmod +x ./run-test.sh && ./run-test.sh
 ```
