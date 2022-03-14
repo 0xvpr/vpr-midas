@@ -1,7 +1,7 @@
 TARGET    = vpr-midas
 
 CC        = x86_64-w64-mingw32-gcc-posix
-CFLAGS    = -std=c99 -O2 -Wall -Wextra -Werror -Wshadow -Wpedantic -Wconversion
+CFLAGS    = -std=c17 -O2 -Wall -Wextra -Werror -Wshadow -Wpedantic -Wconversion
 
 LD        = x86_64-w64-mingw32-gcc-posix
 LDFLAGS   = -nostdinc++
@@ -66,13 +66,10 @@ install: release
 .PHONY: clean
 clean:
 	rm -fr $(BIN)/*
-	rm -fr $(BUILD)/*
-	make -C Tests/ELF clean
-	make -C Tests/PE clean
+	rm -fr $(BUILD)/debug/*
+	rm -fr $(BUILD)/release/*
 
 .PHONY: extra-clean
 extra-clean:
 	rm -fr $(BIN)
 	rm -fr $(BUILD)
-	make -C Tests/ELF clean
-	make -C Tests/PE clean
