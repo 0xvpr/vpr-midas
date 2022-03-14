@@ -1,6 +1,3 @@
 ### Midas
-- [ ] Support multiple files
-- [ ] 
-- [ ]
-- [ ]
-- [ ]
+- [x] Support multiple files
+- [ ] Support custom datetime format option

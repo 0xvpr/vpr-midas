@@ -23,7 +23,7 @@ make
 
 ## Example Usage
 ```bash
-vpr-midas path/to/file [ -c | --custom | -s | --silent ]
+vpr-midas path/to/file1 path/to/file2 -c "19900101000000" --silent
 ```
 
 ## Testing (Needs improvement)
