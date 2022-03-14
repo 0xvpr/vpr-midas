@@ -6,12 +6,16 @@
 #define OP_CUSTOM (1 <<  0)
 #define OP_SILENT (1 << 31)
 
-_Noreturn void __usage_error(char* msg, char* argv_0)
+static int operation = 0;
+static char* argv_0;
+
+_Noreturn void __usage_error(char* msg)
 {
     fprintf(stderr,
         "Error message: %s.\n"
         "\n"
-        "Usage: %s <path/to/file> [path/to/other/files] [ <optional arguments> ]\n"
+        "Usage: \n"
+        "  %s <path/to/file> [path/to/other/files] [ <optional arguments> ]\n"
         "\n"
         "positional arguments:\n"
         "  path/to/payload\n"
@@ -22,19 +26,20 @@ _Noreturn void __usage_error(char* msg, char* argv_0)
         "  -s,--silent\tsuppress the standard output\n"
         "\n"
         "example:\n"
-        "  %s test.txt -c \"19990101000000\""
+        "  %s test.txt -c \"19990101000000\"\n"
         , msg, argv_0, argv_0);
     exit(-1);
 }
 
-int parse_command_line(int argc, char** argv)
+char* parse_command_line(int argc, char** argv)
 {
-    int operation = 0;
+    
+    char* datetime = (char *)calloc(14, sizeof(char));
     char buffer[32];
 
     if (argc < 2)
     {
-        __usage_error(argv[0], "No arguments supplied");
+        __usage_error("No arguments supplied");
     }
 
     for (int i = 1; i < argc; i++)
@@ -46,9 +51,22 @@ int parse_command_line(int argc, char** argv)
                 switch (argv[i][1])
                 {
                     case 'c':
-                    case 'C':
                     {
-                        operation |= OP_CUSTOM;
+                        if (i+1 >= argc)
+                        {
+                            __usage_error("No format specified");
+                        }
+                        else
+                        {
+                            operation |= OP_CUSTOM;
+                            strncpy(datetime, argv[i+1], sizeof("YYYYMMDDHHMMSS"));
+                        }
+
+                        break;
+                    }
+                    case 's':
+                    {
+                        operation |= OP_SILENT;
                         break;
                     }
                     case '-':
@@ -60,20 +78,83 @@ int parse_command_line(int argc, char** argv)
                         }
                         else if (!strncmp("custom", buffer, sizeof("custom")))
                         {
-                            operation |= OP_CUSTOM;
+                            if (i+1 >= argc)
+                            {
+                                __usage_error("No format specified");
+                            }
+                            else
+                            {
+                                operation |= OP_CUSTOM;
+                                strncpy(datetime, argv[i+1], sizeof("YYYYMMDDHHMMSS"));
+                            }
                         }
                         else
                         {
-                            __usage_error(argv[0], "unknown option supplied");
+                            __usage_error("unknown option supplied");
                         }
                         break;
+                    }
+                    default:
+                    {
+                        __usage_error("unknown option supplied");
                     }
                 }
             }
         }
     }
 
-    return operation;
+    return datetime;
+}
+
+void SetDefaultTime(LPSYSTEMTIME pSystemTime)
+{
+    GetLocalTime(pSystemTime);
+    pSystemTime->wYear         = 1999;
+    pSystemTime->wMonth        = 12;
+    pSystemTime->wDay          = 31;
+    pSystemTime->wDayOfWeek    = 5;
+    pSystemTime->wHour         = 0;
+    pSystemTime->wMinute       = 0;
+    pSystemTime->wSecond       = 0;
+    pSystemTime->wMilliseconds = 0;
+}
+
+void SetCustomTime(LPSYSTEMTIME pSystemTime, LPCSTR fmt)
+{
+    if (strlen(fmt) != 14)
+    {
+        __usage_error("Invalid datetime format");
+    }
+
+    for (int i = 0; i < 14; i++)
+    {
+        if ((fmt[i] < '0') || (fmt[i] > '9'))
+        {
+            __usage_error("Invalid character detected");
+        }
+    }
+
+    char buffer_wYear[5]   = { 0 };
+    char buffer_wMonth[3]  = { 0 };
+    char buffer_wDay[3]    = { 0 };
+    char buffer_wHour[3]   = { 0 };
+    char buffer_wMinute[3] = { 0 };
+    char buffer_wSecond[3] = { 0 };
+
+    memcpy(buffer_wYear,   fmt+0,  sizeof(buffer_wYear)-1);
+    memcpy(buffer_wMonth,  fmt+4,  sizeof(buffer_wMonth)-1);
+    memcpy(buffer_wDay,    fmt+6,  sizeof(buffer_wDay)-1);
+    memcpy(buffer_wHour,   fmt+8,  sizeof(buffer_wHour)-1);
+    memcpy(buffer_wMinute, fmt+10, sizeof(buffer_wMinute)-1);
+    memcpy(buffer_wSecond, fmt+12, sizeof(buffer_wSecond)-1);
+
+    sscanf(buffer_wYear,   "%hu", &(pSystemTime->wYear));
+    sscanf(buffer_wMonth,  "%hu", &(pSystemTime->wMonth));
+    sscanf(buffer_wDay,    "%hu", &(pSystemTime->wDay));
+    sscanf(buffer_wHour,   "%hu", &(pSystemTime->wHour));
+    sscanf(buffer_wMinute, "%hu", &(pSystemTime->wMinute));
+    sscanf(buffer_wSecond, "%hu", &(pSystemTime->wSecond));
+    sscanf(buffer_wYear,   "%hu", &(pSystemTime->wYear));
 }
 
 int main(int argc, char** argv)
@@ -83,10 +164,10 @@ int main(int argc, char** argv)
     SYSTEMTIME  system_time;
     FILETIME    file_time;
     LPCSTR      file_name;
-    LPCSTR      datetime;
-    BOOL        operation;
+    LPSTR       datetime;
 
-    operation = parse_command_line(argc, argv);
+    argv_0 = argv[0];
+    datetime = parse_command_line(argc, argv);
 
     for (int i = 1; i < argc; i++)
     {
@@ -101,16 +182,14 @@ int main(int argc, char** argv)
             fclose(fp);
         }
 
-        GetLocalTime(&system_time);
-
-        system_time.wYear         = 1999;
-        system_time.wMonth        = 12;
-        system_time.wDay          = 31;
-        system_time.wDayOfWeek    = 5;
-        system_time.wMilliseconds = 0;
-        system_time.wMinute       = 0;
-        system_time.wHour         = 0;
-        system_time.wSecond       = 0;
+        if (operation & 1)
+        {
+            SetCustomTime(&system_time, datetime);
+        }
+        else
+        {
+            SetDefaultTime(&system_time);
+        }
 
         SystemTimeToFileTime(&system_time, &file_time);
         hFile = CreateFile(file_name,                          // File name
@@ -125,12 +204,12 @@ int main(int argc, char** argv)
         CloseHandle(hFile);
 
         datetime = datetime ? datetime : "default";
-        if (!(operation & OP_SILENT))
+        if ((operation >> 31) & 1)
         {
             fprintf(stdout, "'%s' successfully processed to date-time: %s", argv[i], datetime);
         }
     }
-    
 
+    free(datetime);
     return 0;
 }
