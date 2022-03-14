@@ -1,4 +1,4 @@
--std=c99
+-std=c17
 --target=x86_64-pc-windows
 -Iinclude
 -isystem/usr/lib/gcc/x86_64-w64-mingw32/9.3-posix/include
