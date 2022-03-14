@@ -52,16 +52,12 @@ $(BUILD):
 	mkdir -p $@/debug
 	mkdir -p $@/release
 
-
-.PHONY: tests
-tests:
-	make -C Tests/ELF all
-	make -C Tests/PE all
-
 .PHONY: install
 install: release
+	cp $(BIN)/$(TARGET).exe $(BIN)/$(TARGET)
 	install -d $(PREFIX)/bin
 	install -m 555 $(BIN)/$(TARGET) $(PREFIX)/bin
+	rm $(BIN)/$(TARGET)
 
 .PHONY: clean
 clean:
