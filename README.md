@@ -19,8 +19,10 @@ chmod +x docker-start.sh && ./docker-start.sh
 ```bash
 git clone https://github.com/0xvpr/vpr-omega-zero
 cd vpr-omega-zero
+mkdir build && cd build
+../configure
 make
-sudo make install # if you want it available globally
+# sudo make install # if you want it available globally
 ```
 
 ## Example Usage

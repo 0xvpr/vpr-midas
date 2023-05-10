@@ -6,8 +6,9 @@
 #define OP_CUSTOM (1 <<  0)
 #define OP_SILENT (1 << 31)
 
-static int operation = 0;
-static char* argv_0;
+static int      operation = 0;
+static char     datetime[32] = { 0 };
+static char*    argv_0;
 
 _Noreturn void __usage_error(char* msg)
 {
@@ -33,9 +34,7 @@ _Noreturn void __usage_error(char* msg)
 
 char* parse_command_line(int argc, char** argv)
 {
-    
-    char* datetime = (char *)calloc(14, sizeof(char));
-    char buffer[32];
+    char buffer[32] = { 0 };
 
     if (argc < 2)
     {
@@ -59,7 +58,7 @@ char* parse_command_line(int argc, char** argv)
                         else
                         {
                             operation |= OP_CUSTOM;
-                            strncpy(datetime, argv[i+1], sizeof("YYYYMMDDHHMMSS"));
+                            memcpy(datetime, argv[i+1], sizeof("YYYYMMDDHHMMSS"));
                         }
 
                         break;
@@ -85,7 +84,7 @@ char* parse_command_line(int argc, char** argv)
                             else
                             {
                                 operation |= OP_CUSTOM;
-                                strncpy(datetime, argv[i+1], sizeof("YYYYMMDDHHMMSS"));
+                                memcpy(datetime, argv[i+1], sizeof("YYYYMMDDHHMMSS"));
                             }
                         }
                         else
@@ -164,10 +163,9 @@ int main(int argc, char** argv)
     SYSTEMTIME  system_time;
     FILETIME    file_time;
     LPCSTR      file_name;
-    LPSTR       datetime;
 
     argv_0 = argv[0];
-    datetime = parse_command_line(argc, argv);
+    parse_command_line(argc, argv);
 
     for (int i = 1; i < argc; i++)
     {
@@ -203,13 +201,12 @@ int main(int argc, char** argv)
         SetFileTime(hFile, &file_time, &file_time, &file_time);
         CloseHandle(hFile);
 
-        datetime = datetime ? datetime : "default";
+        char* _datetime = datetime[0] ? datetime : "default";
         if ((operation >> 31) & 1)
         {
-            fprintf(stdout, "'%s' successfully processed to date-time: %s", argv[i], datetime);
+            fprintf(stdout, "'%s' successfully processed to date-time: %s", argv[i], _datetime);
         }
     }
 
-    free(datetime);
     return 0;
 }
