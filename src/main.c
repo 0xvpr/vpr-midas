@@ -1,16 +1,23 @@
+#include <windows.h>
+
 #include <stdio.h>
 #include <time.h>
 
-#include <windows.h>
+#define     OP_CUSTOM (1 <<  0)
+#define     OP_SILENT (1 << 31)
 
-#define OP_CUSTOM (1 <<  0)
-#define OP_SILENT (1 << 31)
+#ifdef      __GNUC__
+  #define     __NORETURN__ __attribute__((noreturn))
+#else
+  #define     __NORETURN__
+#endif //   __GNUC__
+
 
 static int      operation = 0;
 static char     datetime[32] = { 0 };
 static char*    argv_0;
 
-_Noreturn void __usage_error(char* msg)
+__NORETURN__ void __usage_error(char* restrict msg)
 {
     fprintf(stderr,
         "Error message: %s.\n"
@@ -32,7 +39,7 @@ _Noreturn void __usage_error(char* msg)
     exit(-1);
 }
 
-char* parse_command_line(int argc, char** argv)
+void parse_command_line(int argc, char** argv)
 {
     char buffer[32] = { 0 };
 
@@ -101,8 +108,6 @@ char* parse_command_line(int argc, char** argv)
             }
         }
     }
-
-    return datetime;
 }
 
 void SetDefaultTime(LPSYSTEMTIME pSystemTime)

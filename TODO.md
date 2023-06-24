@@ -1,6 +1,4 @@
 ### Midas
-- [ ] Support multiple files
-- [ ] 
-- [ ]
-- [ ]
-- [ ]
+- [ ] Change build system to CMake
+- [ ] Make tests less shit
+- [ ] Improve README.md

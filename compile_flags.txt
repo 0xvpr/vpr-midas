@@ -1,9 +1,7 @@
--std=c17
+-std=c99
 --target=x86_64-pc-windows-gnu
--Iinclude
--isystem/usr/lib/gcc/x86_64-w64-mingw32/10-posix/include
--isystem/usr/lib/gcc/x86_64-w64-mingw32/10-posix/include-fixed
 -isystem/usr/x86_64-w64-mingw32/include
+-Iinclude
 -Wall
 -Wextra
 -Werror
