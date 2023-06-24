@@ -98,7 +98,7 @@ Makefile
 # Exclude Folders
 venv
 bin
-Build
+build
 
 # Exclude Compiled Files
 **/*.a
@@ -111,6 +111,3 @@ Build
 **/*.lib
 **/*.dll
 **/vpr-extract
-
-# Misc
-quick-test.sh
