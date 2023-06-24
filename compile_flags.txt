@@ -1,13 +1,10 @@
--std=c17
---target=x86_64-pc-windows
+-std=c99
+--target=x86_64-pc-windows-gnu
+-isystem/usr/x86_64-w64-mingw32/include
 -Iinclude
--isystem/usr/lib/gcc/x86_64-w64-mingw32/9.3-posix/include
--isystem/usr/lib/gcc/x86_64-w64-mingw32/9.3-posix/include-fixed
--isystem/usr/lib/gcc/x86_64-w64-mingw32/9.3-posix/../../../../x86_64-w64-mingw32/include
 -Wall
 -Wextra
 -Werror
 -Wshadow
 -Wpedantic
 -Wconversion
--fms-extensions
